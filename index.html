@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora de Vacaciones Proporcionales (Chile)</title>
+  <title>Calculadora Vacaciones Proporcionales (Chile)</title>
   <style>
     :root {
       --primary: #2563eb;
       --bg: #f8fafc;
       --card: #ffffff;
       --text: #1e293b;
-      --border: #e2e8f0;
+      --border: #cbd5e1;
     }
 
     body {
@@ -26,17 +26,18 @@
     .container {
       background: var(--card);
       width: 100%;
-      max-width: 500px;
-      padding: 24px;
+      max-width: 520px;
+      padding: 28px;
       border-radius: 12px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
       border: 1px solid var(--border);
     }
 
     h2 {
       margin-top: 0;
       color: #0f172a;
-      font-size: 1.25rem;
+      font-size: 1.3rem;
+      text-align: center;
     }
 
     .form-group {
@@ -69,6 +70,7 @@
       font-size: 1rem;
       font-weight: 600;
       cursor: pointer;
+      margin-top: 8px;
       transition: background 0.2s;
     }
 
@@ -79,7 +81,19 @@
     .results {
       margin-top: 24px;
       padding-top: 16px;
-      border-top: 1px solid var(--border);
+      border-top: 2px dashed var(--border);
+    }
+
+    .card-detail {
+      background: #f1f5f9;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+
+    .card-detail p {
+      margin: 4px 0;
+      font-size: 0.9rem;
     }
 
     .result-row {
@@ -91,11 +105,11 @@
 
     .total {
       font-weight: bold;
-      font-size: 1.1rem;
+      font-size: 1.2rem;
       color: #16a34a;
-      margin-top: 12px;
-      padding-top: 8px;
-      border-top: 1px dashed var(--border);
+      margin-top: 16px;
+      padding-top: 12px;
+      border-top: 2px solid #16a34a;
     }
   </style>
 </head>
@@ -105,35 +119,49 @@
   <h2>Calculadora Vacaciones Proporcionales</h2>
   
   <div class="form-group">
-    <label for="fInicio">Fecha de Inicio de Contrato</label>
+    <label for="fInicio">Fecha de Ingreso de Trabajo</label>
     <input type="date" id="fInicio" required>
   </div>
 
   <div class="form-group">
-    <label for="fTermino">Fecha de Término de Contrato</label>
+    <label for="fTermino">Fecha de Finiquito / Desvinculación</label>
     <input type="date" id="fTermino" required>
   </div>
 
   <div class="form-group">
-    <label for="sueldo">Sueldo Base / Promedio ($)</label>
+    <label for="sueldo">Sueldo Base o Promedio ($)</label>
     <input type="number" id="sueldo" placeholder="Ej: 600000" min="0" required>
   </div>
 
-  <button onclick="calcularFeriado()">Calcular Finiquito</button>
+  <button onclick="calcularFiniquito()">Calcular Vacaciones Proporcionales</button>
 
   <div class="results" id="resultados" style="display:none;">
+    
+    <div class="card-detail">
+      <p>⏱️ <strong>Tiempo Trabajado:</strong> <span id="antiguedadText"></span></p>
+      <p>📅 <strong>Periodo Proporcional:</strong> <span id="periodoText"></span></p>
+    </div>
+
     <div class="result-row">
-      <span>Días Hábiles Proporcionales:</span>
+      <span>Días Hábiles (Excel REDONDEAR):</span>
       <strong id="diasHabiles">0</strong>
     </div>
+
     <div class="result-row">
-      <span>Días Corridos (a pagar):</span>
+      <span>Días Inhábiles (Fines de semana/Festivos):</span>
+      <strong id="diasInhabiles">0</strong>
+    </div>
+
+    <div class="result-row">
+      <span><strong>Total Días Corridos a Pagar:</strong></span>
       <strong id="diasCorridos">0</strong>
     </div>
-    <div class="result-row">
-      <span>Monto Diario (Sueldo/30):</span>
+
+    <div class="result-row" style="margin-top: 8px;">
+      <span>Monto Diario (Sueldo / 30):</span>
       <strong id="montoDiario">$0</strong>
     </div>
+
     <div class="result-row total">
       <span>Total Feriado Proporcional:</span>
       <strong id="montoTotal">$0</strong>
@@ -157,7 +185,12 @@
     return feriadosChile.includes(fechaStr);
   }
 
-  function calcularFeriado() {
+  // Simulación exacta de REDONDEAR( ; 2) de Excel
+  function redondearExcel(val, dec = 2) {
+    return Number(Math.round(val + 'e' + dec) + 'e-' + dec);
+  }
+
+  function calcularFiniquito() {
     const inicioStr = document.getElementById('fInicio').value;
     const terminoStr = document.getElementById('fTermino').value;
     const sueldo = parseFloat(document.getElementById('sueldo').value);
@@ -171,22 +204,40 @@
     const termino = new Date(terminoStr + 'T00:00:00');
 
     if (termino < inicio) {
-      alert("La fecha de término no puede ser anterior a la fecha de inicio.");
+      alert("La fecha de término no puede ser anterior a la de inicio.");
       return;
     }
 
-    const diffTime = Math.abs(termino - inicio);
-    const diasTrabajados = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    // 1. Cálculo de Años, Meses y Días (Meses comerciales de 30 días)
+    let y1 = inicio.getFullYear(), m1 = inicio.getMonth(), d1 = inicio.getDate();
+    let y2 = termino.getFullYear(), m2 = termino.getMonth(), d2 = termino.getDate();
 
-    const diasHabilesAcc = diasTrabajados * (15 / 365);
+    let anios = y2 - y1;
+    let meses = m2 - m1;
+    let dias = d2 - d1 + 1; // Incluye día de ingreso y desvinculación
 
+    if (dias < 0) {
+      meses--;
+      dias += 30;
+    }
+    if (meses < 0) {
+      anios--;
+      meses += 12;
+    }
+
+    // 2. FÓRMULA DE TU EXCEL: REDONDEAR((1.25 * (Meses + Anios*12)) + ((1.25/30) * Dias) ; 2)
+    const mesesTotales = meses + (anios * 12);
+    const diasHabilesSinRedondear = (1.25 * mesesTotales) + ((1.25 / 30) * dias);
+    const diasHabilesAcc = redondearExcel(diasHabilesSinRedondear, 2); // Exactamente 1.71
+
+    // 3. Proyección en Calendario (Fines de semana y Feriados de Chile)
     let fechaAux = new Date(termino);
     fechaAux.setDate(fechaAux.getDate() + 1);
 
     let habilesContados = 0;
     
     while (habilesContados < diasHabilesAcc) {
-      const diaSemana = fechaAux.getDay();
+      const diaSemana = fechaAux.getDay(); // 0 = Dom, 6 = Sáb
       const fechaIso = fechaAux.toISOString().split('T')[0];
 
       if (diaSemana !== 0 && diaSemana !== 6 && !esFeriado(fechaIso)) {
@@ -200,18 +251,33 @@
       fechaAux.setDate(fechaAux.getDate() + 1);
     }
 
-    const diffCorridos = Math.abs(fechaAux - termino);
-    let diasCorridos = Math.ceil(diffCorridos / (1000 * 60 * 60 * 24));
+    // 4. Conversión a Días Corridos
+    const diffTime = Math.abs(fechaAux - termino);
+    let diasCorridosBrutos = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    const fraccionDiasCorridos = (diasCorridosBrutos - 1) + (diasHabilesAcc % 1);
+    const diasInhabiles = fraccionDiasCorridos - diasHabilesAcc;
 
-    const fraccionDiasCorridos = (diasCorridos - 1) + (diasHabilesAcc % 1);
-
+    // 5. Total Monetario
     const valorDiario = sueldo / 30;
     const totalPagar = fraccionDiasCorridos * valorDiario;
 
-    document.getElementById('diasHabiles').innerText = diasHabilesAcc.toFixed(2);
-    document.getElementById('diasCorridos').innerText = fraccionDiasCorridos.toFixed(2);
+    // Mostrar en Pantalla
+    let textoTiempo = [];
+    if (anios > 0) textoTiempo.push(`${anios} año(s)`);
+    if (meses > 0) textoTiempo.push(`${meses} mes(es)`);
+    if (dias > 0) textoTiempo.push(`${dias} día(s)`);
+
+    document.getElementById('antiguedadText').innerText = textoTiempo.join(', ') || '1 día';
+    document.getElementById('periodoText').innerText = 
+      `${inicio.toLocaleDateString('es-CL')} al ${termino.toLocaleDateString('es-CL')}`;
+    
+    document.getElementById('diasHabiles').innerText = diasHabilesAcc.toFixed(2); // DARA EXACTO 1.71
+    document.getElementById('diasInhabiles').innerText = redondearExcel(diasInhabiles, 2).toFixed(2);
+    document.getElementById('diasCorridos').innerText = redondearExcel(fraccionDiasCorridos, 2).toFixed(2);
     document.getElementById('montoDiario').innerText = '$' + Math.round(valorDiario).toLocaleString('es-CL');
     document.getElementById('montoTotal').innerText = '$' + Math.round(totalPagar).toLocaleString('es-CL');
+
     document.getElementById('resultados').style.display = 'block';
   }
 </script>
