@@ -170,8 +170,13 @@
   </div>
 
   <div class="form-group">
-    <label for="sueldoVacaciones">Sueldo Base Mensual ($) <small>(Para Vacaciones Proporcionales)</small></label>
+    <label for="sueldoVacaciones">Sueldo Base Mensual ($) <small>(Para Vacaciones)</small></label>
     <input type="number" id="sueldoVacaciones" placeholder="Ej: 600000" min="0" required>
+  </div>
+
+  <div class="form-group">
+    <label for="diasTomados">Días de Vacaciones Tomados (Hábiles)</label>
+    <input type="number" id="diasTomados" placeholder="Ej: 0" min="0" step="0.01" value="0">
   </div>
 
   <!-- Opción para Indemnización -->
@@ -203,7 +208,17 @@
     <div class="section-title">VACACIONES PROPORCIONALES</div>
 
     <div class="result-row">
-      <span>Días Hábiles Acumulados:</span>
+      <span>Días Hábiles Generados:</span>
+      <strong id="diasGenerados">0</strong>
+    </div>
+
+    <div class="result-row" id="rowDiasTomados" style="display: none; color: #dc2626;">
+      <span>(-) Días de Vacaciones Tomados:</span>
+      <strong id="valDiasTomados">0</strong>
+    </div>
+
+    <div class="result-row">
+      <span><strong>Días Hábiles Pendientes a Pagar:</strong></span>
       <strong id="diasHabiles">0</strong>
     </div>
 
@@ -278,6 +293,7 @@
     const inicioStr = document.getElementById('fInicio').value;
     const terminoStr = document.getElementById('fTermino').value;
     const sueldoVac = parseFloat(document.getElementById('sueldoVacaciones').value);
+    const diasTomados = parseFloat(document.getElementById('diasTomados').value) || 0;
 
     if (!inicioStr || !terminoStr || isNaN(sueldoVac) || sueldoVac <= 0) {
       alert("Por favor completa las fechas y el sueldo base correctamente.");
@@ -309,10 +325,14 @@
       meses += 12;
     }
 
-    // 2. VACACIONES PROPORCIONALES (Calculado con Sueldo Base)
+    // 2. VACACIONES PROPORCIONALES
     const mesesTotales = meses + (anios * 12);
-    const diasHabilesSinRedondear = (1.25 * mesesTotales) + ((1.25 / 30) * dias);
-    const diasHabilesAcc = redondearExcel(diasHabilesSinRedondear, 2);
+    const diasGeneradosSinRedondear = (1.25 * mesesTotales) + ((1.25 / 30) * dias);
+    const diasGeneradosAcc = redondearExcel(diasGeneradosSinRedondear, 2);
+
+    // Restamos días tomados
+    let diasHabilesAcc = redondearExcel(diasGeneradosAcc - diasTomados, 2);
+    if (diasHabilesAcc < 0) diasHabilesAcc = 0; // Evitar valores negativos
 
     let fechaAux = new Date(termino);
     fechaAux.setDate(fechaAux.getDate() + 1);
@@ -342,7 +362,7 @@
     const valorDiario = sueldoVac / 30;
     const totalVacaciones = fraccionDiasCorridos * valorDiario;
 
-    // 3. INDEMNIZACIÓN POR AÑOS DE SERVICIO (Calculado sobre TOTAL HABERES)
+    // 3. INDEMNIZACIÓN POR AÑOS DE SERVICIO
     let totalIas = 0;
     let aniosAbonar = 0;
     let baseMensualFinal = 0;
@@ -351,7 +371,6 @@
     if (incluyeIas) {
       const totalHaberesVal = parseFloat(document.getElementById('totalHaberes').value) || sueldoVac;
 
-      // Regla Art. 163: Mínimo 1 año. Fracción superior a 6 meses suma 1 año más
       if (anios >= 1 || (anios === 0 && meses > 6)) {
         aniosAbonar = anios;
         if (meses > 6 || (meses === 6 && dias > 0)) {
@@ -359,12 +378,10 @@
         }
       }
 
-      // Tope Legal de 11 años
       if (aniosAbonar > 11) {
         aniosAbonar = 11;
       }
 
-      // Tope Legal de 90 UF sobre Total Haberes
       const valorUf = parseFloat(document.getElementById('valorUf').value) || 39000;
       const topeMaximo90Uf = 90 * valorUf;
 
@@ -382,6 +399,15 @@
     document.getElementById('periodoText').innerText = 
       `${inicio.toLocaleDateString('es-CL')} al ${termino.toLocaleDateString('es-CL')}`;
     
+    document.getElementById('diasGenerados').innerText = diasGeneradosAcc.toFixed(2);
+
+    if (diasTomados > 0) {
+      document.getElementById('valDiasTomados').innerText = diasTomados.toFixed(2);
+      document.getElementById('rowDiasTomados').style.display = 'flex';
+    } else {
+      document.getElementById('rowDiasTomados').style.display = 'none';
+    }
+
     document.getElementById('diasHabiles').innerText = diasHabilesAcc.toFixed(2);
     document.getElementById('diasInhabiles').innerText = redondearExcel(diasInhabiles, 2).toFixed(2);
     document.getElementById('diasCorridos').innerText = redondearExcel(fraccionDiasCorridos, 2).toFixed(2);
