@@ -88,6 +88,33 @@
     }
     .uf-info.ok { color: #16a34a; }
     .uf-info.error { color: #dc2626; }
+    .info-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-left: 6px;
+      vertical-align: middle;
+      user-select: none;
+    }
+    .info-box {
+      display: none;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e3a8a;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      padding: 8px 10px;
+      border-radius: 6px;
+      margin: 6px 0 0 0;
+    }
     button {
       width: 100%;
       background-color: var(--primary);
@@ -166,8 +193,15 @@
     <input type="date" id="fTermino" required>
   </div>
   <div class="form-group">
-    <label for="sueldoVacaciones">Sueldo Base Mensual ($) <small>(Para Vacaciones)</small></label>
+    <label for="sueldoVacaciones">Sueldo Base Mensual ($) <small>(Para Vacaciones)</small>
+      <span class="info-icon" onclick="toggleInfo('infoSueldoBase')">?</span>
+    </label>
     <input type="number" id="sueldoVacaciones" placeholder="Ej: 600000" min="0" required>
+    <div class="info-box" id="infoSueldoBase">
+      Ingresa la <strong>remuneración íntegra para vacaciones</strong>: el sueldo base más los bonos
+      fijos o regulares (o el promedio de los bonos variables). El valor se obtiene
+      <strong>promediando los últimos 3 meses trabajados</strong>. No incluyas la gratificación.
+    </div>
   </div>
   <div class="form-group">
     <label for="diasTomados">Días de Vacaciones Tomados (Hábiles)</label>
@@ -180,8 +214,14 @@
   </div>
   <div class="optional-box" id="boxIas" style="display: none;">
     <div class="form-group">
-      <label for="totalHaberes">Total Haberes / Última Remuneración Mensual ($)</label>
+      <label for="totalHaberes">Total Haberes / Última Remuneración Mensual ($)
+        <span class="info-icon" onclick="toggleInfo('infoTotalHaberes')">?</span>
+      </label>
       <input type="number" id="totalHaberes" placeholder="Ej: 850000" min="0">
+      <div class="info-box" id="infoTotalHaberes">
+        Ingresa el <strong>total de haberes</strong> (sueldo base + gratificación + bonos imponibles,
+        etc.). El valor se obtiene <strong>promediando los últimos 3 meses trabajados</strong>.
+      </div>
     </div>
     <div class="form-group" style="margin-bottom: 0;">
       <label for="valorUf">Valor UF Actual ($) <small>(Para tope 90 UF)</small></label>
@@ -196,7 +236,17 @@
       <p>⏱️ <strong>Tiempo Trabajado:</strong> <span id="antiguedadText"></span></p>
       <p>📅 <strong>Periodo Proporcional:</strong> <span id="periodoText"></span></p>
     </div>
-    <div class="section-title">VACACIONES PROPORCIONALES</div>
+    <div class="section-title">VACACIONES PROPORCIONALES
+      <span class="info-icon" onclick="toggleInfo('infoVacacionesCalc')">?</span>
+    </div>
+    <div class="info-box" id="infoVacacionesCalc">
+      Las vacaciones proporcionales se calculan a razón de <strong>15 días hábiles por cada año
+      completo de servicio</strong> (1,25 días hábiles por mes trabajado). Para pagarlas, esos días
+      hábiles se convierten a días corridos: se cuenta desde el día siguiente a la fecha de término
+      y se suman los fines de semana y feriados que caen en ese período, porque el conteo de los
+      días pendientes empieza a correr recién desde la desvinculación y el pago se hace en días
+      corridos, no solo hábiles.
+    </div>
     <div class="result-row">
       <span>Días Hábiles Generados:</span>
       <strong id="diasGenerados">0</strong>
@@ -224,7 +274,15 @@
     </div>
     <!-- Sección de Indemnización -->
     <div id="seccionResultadoIas" style="display: none;">
-      <div class="section-title" style="margin-top: 16px;">INDEMNIZACIÓN POR AÑOS DE SERVICIO</div>
+      <div class="section-title" style="margin-top: 16px;">INDEMNIZACIÓN POR AÑOS DE SERVICIO
+        <span class="info-icon" onclick="toggleInfo('infoIasCalc')">?</span>
+      </div>
+      <div class="info-box" id="infoIasCalc">
+        Corresponde a <strong>30 días de la última remuneración mensual por cada año de servicio</strong>
+        y fracción superior a 6 meses. Requiere un mínimo de 1 año completo de servicio continuo para
+        tener derecho a ella, tiene un <strong>tope máximo de 11 años</strong> y la remuneración mensual
+        usada como base no puede exceder de <strong>90 UF</strong>.
+      </div>
 
       <div class="result-row">
         <span>Años de Servicio Calculados:</span>
@@ -269,6 +327,12 @@
   function toggleIasOptions() {
     const chk = document.getElementById('chkIas').checked;
     document.getElementById('boxIas').style.display = chk ? 'block' : 'none';
+  }
+
+  // Muestra/oculta los recuadros de ayuda ("?") junto a campos y secciones
+  function toggleInfo(id) {
+    const box = document.getElementById(id);
+    box.style.display = box.style.display === 'block' ? 'none' : 'block';
   }
 
   // Trae el valor UF vigente desde la API pública de mindicador.cl
