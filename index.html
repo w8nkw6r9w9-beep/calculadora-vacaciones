@@ -143,7 +143,7 @@
     </div>
 
     <div class="result-row">
-      <span>Días Hábiles (Excel REDONDEAR):</span>
+      <span>Días Hábiles Acumulados:</span>
       <strong id="diasHabiles">0</strong>
     </div>
 
@@ -185,7 +185,6 @@
     return feriadosChile.includes(fechaStr);
   }
 
-  // Simulación exacta de REDONDEAR( ; 2) de Excel
   function redondearExcel(val, dec = 2) {
     return Number(Math.round(val + 'e' + dec) + 'e-' + dec);
   }
@@ -208,13 +207,12 @@
       return;
     }
 
-    // 1. Cálculo de Años, Meses y Días (Meses comerciales de 30 días)
     let y1 = inicio.getFullYear(), m1 = inicio.getMonth(), d1 = inicio.getDate();
     let y2 = termino.getFullYear(), m2 = termino.getMonth(), d2 = termino.getDate();
 
     let anios = y2 - y1;
     let meses = m2 - m1;
-    let dias = d2 - d1 + 1; // Incluye día de ingreso y desvinculación
+    let dias = d2 - d1 + 1;
 
     if (dias < 0) {
       meses--;
@@ -225,19 +223,17 @@
       meses += 12;
     }
 
-    // 2. FÓRMULA DE TU EXCEL: REDONDEAR((1.25 * (Meses + Anios*12)) + ((1.25/30) * Dias) ; 2)
     const mesesTotales = meses + (anios * 12);
     const diasHabilesSinRedondear = (1.25 * mesesTotales) + ((1.25 / 30) * dias);
-    const diasHabilesAcc = redondearExcel(diasHabilesSinRedondear, 2); // Exactamente 1.71
+    const diasHabilesAcc = redondearExcel(diasHabilesSinRedondear, 2);
 
-    // 3. Proyección en Calendario (Fines de semana y Feriados de Chile)
     let fechaAux = new Date(termino);
     fechaAux.setDate(fechaAux.getDate() + 1);
 
     let habilesContados = 0;
     
     while (habilesContados < diasHabilesAcc) {
-      const diaSemana = fechaAux.getDay(); // 0 = Dom, 6 = Sáb
+      const diaSemana = fechaAux.getDay();
       const fechaIso = fechaAux.toISOString().split('T')[0];
 
       if (diaSemana !== 0 && diaSemana !== 6 && !esFeriado(fechaIso)) {
@@ -251,18 +247,15 @@
       fechaAux.setDate(fechaAux.getDate() + 1);
     }
 
-    // 4. Conversión a Días Corridos
     const diffTime = Math.abs(fechaAux - termino);
     let diasCorridosBrutos = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
     const fraccionDiasCorridos = (diasCorridosBrutos - 1) + (diasHabilesAcc % 1);
     const diasInhabiles = fraccionDiasCorridos - diasHabilesAcc;
 
-    // 5. Total Monetario
     const valorDiario = sueldo / 30;
     const totalPagar = fraccionDiasCorridos * valorDiario;
 
-    // Mostrar en Pantalla
     let textoTiempo = [];
     if (anios > 0) textoTiempo.push(`${anios} año(s)`);
     if (meses > 0) textoTiempo.push(`${meses} mes(es)`);
@@ -272,7 +265,7 @@
     document.getElementById('periodoText').innerText = 
       `${inicio.toLocaleDateString('es-CL')} al ${termino.toLocaleDateString('es-CL')}`;
     
-    document.getElementById('diasHabiles').innerText = diasHabilesAcc.toFixed(2); // DARA EXACTO 1.71
+    document.getElementById('diasHabiles').innerText = diasHabilesAcc.toFixed(2);
     document.getElementById('diasInhabiles').innerText = redondearExcel(diasInhabiles, 2).toFixed(2);
     document.getElementById('diasCorridos').innerText = redondearExcel(fraccionDiasCorridos, 2).toFixed(2);
     document.getElementById('montoDiario').innerText = '$' + Math.round(valorDiario).toLocaleString('es-CL');
