@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calculadora Finiquito y Vacaciones Proporcionales (Chile)</title>
+  <title>Calculadora de Finiquito Completo (Chile)</title>
   <style>
     :root {
       --primary: #2563eb;
@@ -86,7 +86,7 @@
 
     .optional-box {
       background: #f8fafc;
-      padding: 12px;
+      padding: 14px;
       border-radius: 8px;
       border: 1px dashed var(--border);
       margin-bottom: 16px;
@@ -170,8 +170,8 @@
   </div>
 
   <div class="form-group">
-    <label for="sueldo">Sueldo Base o Promedio Imponible ($)</label>
-    <input type="number" id="sueldo" placeholder="Ej: 600000" min="0" required>
+    <label for="sueldoVacaciones">Sueldo Base Mensual ($) <small>(Para Vacaciones Proporcionales)</small></label>
+    <input type="number" id="sueldoVacaciones" placeholder="Ej: 600000" min="0" required>
   </div>
 
   <!-- Opción para Indemnización -->
@@ -181,8 +181,12 @@
   </div>
 
   <div class="optional-box" id="boxIas" style="display: none;">
+    <div class="form-group">
+      <label for="totalHaberes">Total Haberes / Última Remuneración Mensual ($)</label>
+      <input type="number" id="totalHaberes" placeholder="Ej: 850000" min="0">
+    </div>
     <div class="form-group" style="margin-bottom: 0;">
-      <label for="valorUf">Valor UF Actual ($) <small>(Para validar tope 90 UF)</small></label>
+      <label for="valorUf">Valor UF Actual ($) <small>(Para tope 90 UF)</small></label>
       <input type="number" id="valorUf" value="39000" placeholder="Ej: 39000">
     </div>
   </div>
@@ -218,7 +222,7 @@
       <strong id="montoVacaciones">$0</strong>
     </div>
 
-    <!-- Sección opcional de Indemnización -->
+    <!-- Sección de Indemnización -->
     <div id="seccionResultadoIas" style="display: none;">
       <div class="section-title" style="margin-top: 16px;">INDEMNIZACIÓN POR AÑOS DE SERVICIO</div>
       
@@ -228,7 +232,7 @@
       </div>
 
       <div class="result-row">
-        <span>Base Mensual Aplicada:</span>
+        <span>Base Total Haberes (o Tope 90 UF):</span>
         <strong id="baseAplicada">$0</strong>
       </div>
 
@@ -273,10 +277,10 @@
   function calcularFiniquito() {
     const inicioStr = document.getElementById('fInicio').value;
     const terminoStr = document.getElementById('fTermino').value;
-    const sueldo = parseFloat(document.getElementById('sueldo').value);
+    const sueldoVac = parseFloat(document.getElementById('sueldoVacaciones').value);
 
-    if (!inicioStr || !terminoStr || isNaN(sueldo) || sueldo <= 0) {
-      alert("Por favor completa todos los campos correctamente.");
+    if (!inicioStr || !terminoStr || isNaN(sueldoVac) || sueldoVac <= 0) {
+      alert("Por favor completa las fechas y el sueldo base correctamente.");
       return;
     }
 
@@ -288,7 +292,7 @@
       return;
     }
 
-    // 1. Antigüedad
+    // 1. ANTIGÜEDAD
     let y1 = inicio.getFullYear(), m1 = inicio.getMonth(), d1 = inicio.getDate();
     let y2 = termino.getFullYear(), m2 = termino.getMonth(), d2 = termino.getDate();
 
@@ -305,7 +309,7 @@
       meses += 12;
     }
 
-    // 2. VACACIONES PROPORCIONALES (Excel REDONDEAR)
+    // 2. VACACIONES PROPORCIONALES (Calculado con Sueldo Base)
     const mesesTotales = meses + (anios * 12);
     const diasHabilesSinRedondear = (1.25 * mesesTotales) + ((1.25 / 30) * dias);
     const diasHabilesAcc = redondearExcel(diasHabilesSinRedondear, 2);
@@ -335,17 +339,19 @@
     const fraccionDiasCorridos = (diasCorridosBrutos - 1) + (diasHabilesAcc % 1);
     const diasInhabiles = fraccionDiasCorridos - diasHabilesAcc;
 
-    const valorDiario = sueldo / 30;
+    const valorDiario = sueldoVac / 30;
     const totalVacaciones = fraccionDiasCorridos * valorDiario;
 
-    // 3. INDEMNIZACIÓN POR AÑOS DE SERVICIO (Art. 163 C. del Trabajo)
+    // 3. INDEMNIZACIÓN POR AÑOS DE SERVICIO (Calculado sobre TOTAL HABERES)
     let totalIas = 0;
     let aniosAbonar = 0;
-    let baseMensualFinal = sueldo;
+    let baseMensualFinal = 0;
     const incluyeIas = document.getElementById('chkIas').checked;
 
     if (incluyeIas) {
-      // Regla: Requiere al menos 1 año completo. Fracción > 6 meses suma 1 año más.
+      const totalHaberesVal = parseFloat(document.getElementById('totalHaberes').value) || sueldoVac;
+
+      // Regla Art. 163: Mínimo 1 año. Fracción superior a 6 meses suma 1 año más
       if (anios >= 1 || (anios === 0 && meses > 6)) {
         aniosAbonar = anios;
         if (meses > 6 || (meses === 6 && dias > 0)) {
@@ -358,18 +364,15 @@
         aniosAbonar = 11;
       }
 
-      // Tope Legal de 90 UF
+      // Tope Legal de 90 UF sobre Total Haberes
       const valorUf = parseFloat(document.getElementById('valorUf').value) || 39000;
       const topeMaximo90Uf = 90 * valorUf;
 
-      if (sueldo > topeMaximo90Uf) {
-        baseMensualFinal = topeMaximo90Uf;
-      }
-
+      baseMensualFinal = totalHaberesVal > topeMaximo90Uf ? topeMaximo90Uf : totalHaberesVal;
       totalIas = aniosAbonar * baseMensualFinal;
     }
 
-    // 4. MOSTRAR RESULTADOS
+    // 4. DESPLIEGUE EN PANTALLA
     let textoTiempo = [];
     if (anios > 0) textoTiempo.push(`${anios} año(s)`);
     if (meses > 0) textoTiempo.push(`${meses} mes(es)`);
