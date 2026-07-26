@@ -36,6 +36,57 @@
       font-size: 1.3rem;
       text-align: center;
     }
+    .autor-line {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #64748b;
+      margin: 0 0 20px 0;
+    }
+    .contact-box {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px dashed var(--border);
+      text-align: center;
+    }
+    .contact-cta-text {
+      font-size: 0.9rem;
+      color: var(--text);
+      margin: 0 0 10px 0;
+      font-weight: 600;
+    }
+    .contact-btn-group {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .contact-btn {
+      display: inline-block;
+      background-color: #2563eb;
+      color: white;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .contact-btn:hover {
+      background-color: #1d4ed8;
+    }
+    .contact-btn.whatsapp {
+      background-color: #16a34a;
+    }
+    .contact-btn.whatsapp:hover {
+      background-color: #15803d;
+    }
+    .contact-info {
+      font-size: 0.8rem;
+      color: #64748b;
+      margin: 10px 0 0 0;
+    }
+    .contact-info a {
+      color: #64748b;
+    }
     .form-group {
       margin-bottom: 16px;
     }
@@ -183,6 +234,7 @@
 <body>
 <div class="container">
   <h2>Calculadora de Finiquito (Chile)</h2>
+  <p class="autor-line">Por Israel Gómez, Contador Auditor</p>
 
   <div class="form-group">
     <label for="fInicio">Fecha de Ingreso de Trabajo</label>
@@ -207,10 +259,18 @@
     <label for="diasTomados">Días de Vacaciones Tomados (Hábiles)</label>
     <input type="number" id="diasTomados" placeholder="Ej: 0" min="0" step="1" value="0" inputmode="numeric">
   </div>
-  <!-- Opción para Indemnización -->
+  <!-- Opciones de módulos adicionales -->
   <div class="checkbox-group">
-    <input type="checkbox" id="chkIas" onchange="toggleIasOptions()">
+    <input type="checkbox" id="chkIas" onchange="actualizarModulos()">
     <label for="chkIas">Incluir Indemnización por Años de Servicio</label>
+  </div>
+  <div class="checkbox-group">
+    <input type="checkbox" id="chkAviso" onchange="actualizarModulos()">
+    <label for="chkAviso">Incluir Indemnización Sustitutiva de Aviso Previo</label>
+  </div>
+  <div class="checkbox-group">
+    <input type="checkbox" id="chkRecargo" onchange="actualizarModulos()">
+    <label for="chkRecargo">Incluir Recargo por Despido Injustificado</label>
   </div>
   <div class="optional-box" id="boxIas" style="display: none;">
     <div class="form-group">
@@ -227,6 +287,39 @@
       <label for="valorUf">Valor UF Actual ($) <small>(Para tope 90 UF)</small></label>
       <input type="number" id="valorUf" value="39000" placeholder="Ej: 39000">
       <div class="uf-info" id="ufInfo">Cargando valor UF desde mindicador.cl...</div>
+    </div>
+
+    <div class="form-group" id="grupoAviso" style="display:none; margin-top: 14px; margin-bottom: 0;">
+      <label for="avisoDado">¿Se dio aviso por escrito con 30 días de anticipación?
+        <span class="info-icon" onclick="toggleInfo('infoAvisoInput')">?</span>
+      </label>
+      <select id="avisoDado" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:6px; box-sizing:border-box; font-size:1rem;">
+        <option value="no">No se dio aviso (o se dio con menos de 30 días)</option>
+        <option value="si">Sí, se dio aviso con 30 días o más de anticipación</option>
+      </select>
+      <div class="info-box" id="infoAvisoInput">
+        Marca "No" si el empleador no entregó la carta de aviso de término con al menos 30 días
+        de anticipación (lo habitual en despidos por necesidades de la empresa). Marca "Sí" solo
+        si el aviso se entregó por escrito con 30 días o más antes de la fecha de término.
+      </div>
+    </div>
+
+    <div class="form-group" id="grupoRecargo" style="display:none; margin-top: 14px; margin-bottom: 0;">
+      <label for="porcentajeRecargo">Porcentaje de recargo aplicable
+        <span class="info-icon" onclick="toggleInfo('infoRecargoInput')">?</span>
+      </label>
+      <select id="porcentajeRecargo" style="width:100%; padding:10px; border:1px solid var(--border); border-radius:6px; box-sizing:border-box; font-size:1rem;">
+        <option value="30">30% – término por necesidades de la empresa declarado improcedente</option>
+        <option value="50">50% – causal injustificada o despido sin causal invocada</option>
+        <option value="80">80% – causal disciplinaria (falta grave) aplicada indebidamente</option>
+        <option value="100">100% – causal disciplinaria grave aplicada sin motivo plausible</option>
+      </select>
+      <div class="info-box" id="infoRecargoInput">
+        Este recargo lo fija un tribunal cuando declara el despido injustificado, indebido o
+        improcedente. Elige el porcentaje según la causal que el empleador haya invocado al
+        despedir; se aplica sobre el monto de la indemnización por años de servicio, así que
+        también debes marcar esa casilla para poder calcularlo.
+      </div>
     </div>
   </div>
   <button onclick="calcularFiniquito()">Calcular Finiquito Completo</button>
@@ -297,9 +390,53 @@
         <strong id="montoIas">$0</strong>
       </div>
     </div>
+    <!-- Sección de Aviso Previo -->
+    <div id="seccionResultadoAviso" style="display: none;">
+      <div class="section-title" style="margin-top: 16px;">INDEMNIZACIÓN SUSTITUTIVA DE AVISO PREVIO
+        <span class="info-icon" onclick="toggleInfo('infoAvisoCalc')">?</span>
+      </div>
+      <div class="info-box" id="infoAvisoCalc">
+        Corresponde cuando el término es por necesidades de la empresa (o desahucio de un cargo de
+        confianza) y no se avisó por escrito con 30 días de anticipación. Equivale a la última
+        remuneración mensual, con el mismo tope de 90 UF. Si sí se avisó con 30 días o más, no
+        corresponde este pago.
+      </div>
+      <div class="result-row">
+        <span>Monto Indemnización Aviso Previo:</span>
+        <strong id="montoAvisoTxt">$0</strong>
+      </div>
+    </div>
+    <!-- Sección de Recargo por Despido Injustificado -->
+    <div id="seccionResultadoRecargo" style="display: none;">
+      <div class="section-title" style="margin-top: 16px;">RECARGO POR DESPIDO INJUSTIFICADO
+        <span class="info-icon" onclick="toggleInfo('infoRecargoCalc')">?</span>
+      </div>
+      <div class="info-box" id="infoRecargoCalc">
+        Cuando un tribunal declara el despido injustificado, indebido o improcedente, la
+        indemnización por años de servicio se incrementa en un porcentaje adicional, que varía
+        según la causal invocada por el empleador. El recargo se calcula sobre el monto de la
+        indemnización por años de servicio.
+      </div>
+      <div class="result-row">
+        <span>Porcentaje de Recargo Aplicado:</span>
+        <strong id="porcentajeRecargoTxt">0%</strong>
+      </div>
+      <div class="result-row">
+        <span>Monto Recargo:</span>
+        <strong id="montoRecargoTxt">$0</strong>
+      </div>
+    </div>
     <div class="result-row total">
       <span>Total Finiquito a Pagar:</span>
       <strong id="montoTotal">$0</strong>
+    </div>
+    <div class="contact-box">
+      <p class="contact-cta-text">¿Quieres que revisemos tu finiquito y su tratamiento tributario?</p>
+      <div class="contact-btn-group">
+        <a class="contact-btn whatsapp" href="https://wa.me/56981479748?text=Hola%20Israel%2C%20quiero%20una%20revisi%C3%B3n%20de%20mi%20finiquito" target="_blank" rel="noopener">Escríbeme por WhatsApp</a>
+        <a class="contact-btn" href="mailto:igomez.contaduria@gmail.com?subject=Consulta%20sobre%20mi%20finiquito">Solicita por correo</a>
+      </div>
+      <p class="contact-info">Israel Gómez · Contador Auditor · <a href="mailto:igomez.contaduria@gmail.com">igomez.contaduria@gmail.com</a> · <a href="https://wa.me/56981479748" target="_blank" rel="noopener">+56 9 8147 9748</a></p>
     </div>
   </div>
 </div>
@@ -324,9 +461,13 @@
   function redondearExcel(val, dec = 2) {
     return Number(Math.round(val + 'e' + dec) + 'e-' + dec);
   }
-  function toggleIasOptions() {
-    const chk = document.getElementById('chkIas').checked;
-    document.getElementById('boxIas').style.display = chk ? 'block' : 'none';
+  function actualizarModulos() {
+    const chkIas = document.getElementById('chkIas').checked;
+    const chkAviso = document.getElementById('chkAviso').checked;
+    const chkRecargo = document.getElementById('chkRecargo').checked;
+    document.getElementById('boxIas').style.display = (chkIas || chkAviso || chkRecargo) ? 'block' : 'none';
+    document.getElementById('grupoAviso').style.display = chkAviso ? 'block' : 'none';
+    document.getElementById('grupoRecargo').style.display = chkRecargo ? 'block' : 'none';
   }
 
   // Muestra/oculta los recuadros de ayuda ("?") junto a campos y secciones
@@ -369,6 +510,13 @@
     const termino = new Date(terminoStr + 'T00:00:00');
     if (termino < inicio) {
       alert("La fecha de término no puede ser anterior a la de inicio.");
+      return;
+    }
+    const incluyeIas = document.getElementById('chkIas').checked;
+    const incluyeAviso = document.getElementById('chkAviso').checked;
+    const incluyeRecargo = document.getElementById('chkRecargo').checked;
+    if (incluyeRecargo && !incluyeIas) {
+      alert("El recargo por despido injustificado se aplica sobre la indemnización por años de servicio. Marca también esa casilla para poder calcularlo.");
       return;
     }
     // 1. ANTIGÜEDAD
@@ -416,17 +564,21 @@
     const diasInhabiles = fraccionDiasCorridos - diasHabilesAcc;
     const valorDiario = sueldoVac / 30;
     const totalVacaciones = fraccionDiasCorridos * valorDiario;
-    // 3. INDEMNIZACIÓN POR AÑOS DE SERVICIO
+    // 3. BASE COMÚN PARA INDEMNIZACIONES (IAS y Aviso Previo comparten el mismo tope de 90 UF)
+    let baseMensualFinal = 0;
+    if (incluyeIas || incluyeAviso) {
+      const totalHaberesVal = parseFloat(document.getElementById('totalHaberes').value) || sueldoVac;
+      const valorUf = parseFloat(document.getElementById('valorUf').value) || VALOR_UF_RESPALDO;
+      const topeMaximo90Uf = 90 * valorUf;
+      baseMensualFinal = totalHaberesVal > topeMaximo90Uf ? topeMaximo90Uf : totalHaberesVal;
+    }
+    // 3a. INDEMNIZACIÓN POR AÑOS DE SERVICIO
     let totalIas = 0;
     let aniosAbonar = 0;
-    let baseMensualFinal = 0;
-    const incluyeIas = document.getElementById('chkIas').checked;
     if (incluyeIas) {
-      const totalHaberesVal = parseFloat(document.getElementById('totalHaberes').value) || sueldoVac;
       // El derecho a indemnización por años de servicio requiere al menos 1 año
-      // completo de servicio continuo (Art. 163 Código del Trabajo). La fracción
-      // superior a 6 meses solo redondea años adicionales al año base, no genera
-      // el derecho por sí sola.
+      // completo de servicio continuo. La fracción superior a 6 meses solo redondea
+      // años adicionales al año base, no genera el derecho por sí sola.
       if (anios >= 1) {
         aniosAbonar = anios;
         if (meses > 6 || (meses === 6 && dias > 0)) {
@@ -436,10 +588,20 @@
       if (aniosAbonar > 11) {
         aniosAbonar = 11;
       }
-      const valorUf = parseFloat(document.getElementById('valorUf').value) || VALOR_UF_RESPALDO;
-      const topeMaximo90Uf = 90 * valorUf;
-      baseMensualFinal = totalHaberesVal > topeMaximo90Uf ? topeMaximo90Uf : totalHaberesVal;
       totalIas = aniosAbonar * baseMensualFinal;
+    }
+    // 3b. INDEMNIZACIÓN SUSTITUTIVA DE AVISO PREVIO
+    let montoAviso = 0;
+    if (incluyeAviso) {
+      const avisoDado = document.getElementById('avisoDado').value;
+      montoAviso = avisoDado === 'no' ? baseMensualFinal : 0;
+    }
+    // 3c. RECARGO POR DESPIDO INJUSTIFICADO (se aplica sobre la IAS)
+    let montoRecargo = 0;
+    let porcentajeRecargo = 0;
+    if (incluyeRecargo) {
+      porcentajeRecargo = parseFloat(document.getElementById('porcentajeRecargo').value) || 0;
+      montoRecargo = totalIas * (porcentajeRecargo / 100);
     }
     // 4. DESPLIEGUE EN PANTALLA
     let textoTiempo = [];
@@ -476,7 +638,20 @@
     } else {
       document.getElementById('seccionResultadoIas').style.display = 'none';
     }
-    const totalFiniquito = totalVacaciones + totalIas;
+    if (incluyeAviso) {
+      document.getElementById('montoAvisoTxt').innerText = '$' + Math.round(montoAviso).toLocaleString('es-CL');
+      document.getElementById('seccionResultadoAviso').style.display = 'block';
+    } else {
+      document.getElementById('seccionResultadoAviso').style.display = 'none';
+    }
+    if (incluyeRecargo) {
+      document.getElementById('porcentajeRecargoTxt').innerText = `${porcentajeRecargo}%`;
+      document.getElementById('montoRecargoTxt').innerText = '$' + Math.round(montoRecargo).toLocaleString('es-CL');
+      document.getElementById('seccionResultadoRecargo').style.display = 'block';
+    } else {
+      document.getElementById('seccionResultadoRecargo').style.display = 'none';
+    }
+    const totalFiniquito = totalVacaciones + totalIas + montoAviso + montoRecargo;
     document.getElementById('montoTotal').innerText = '$' + Math.round(totalFiniquito).toLocaleString('es-CL');
     document.getElementById('resultados').style.display = 'block';
   }
