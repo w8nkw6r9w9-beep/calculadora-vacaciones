@@ -1,1 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Sueldo y Costo Empresa - Chile</title>
+    <!-- Tailwind CSS para un diseño limpio y moderno -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans min-h-screen py-10 px-4">
 
+    <div class="max-w-4xl mx-auto">
+        <!-- Encabezado -->
+        <header class="text-center mb-8">
+            <h1 class="text-3xl font-extrabold text-blue-900 mb-2">Simulador de Sueldo y Costo Empresa 🇨🇱</h1>
+            <p class="text-gray-600">Calcula tu sueldo líquido como trabajador o descubre el costo real para tu Pyme.</p>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- FORMULARIO DE INGRESO -->
+            <div class="bg-white p-6 rounded-xl shadow-md border border-gray-100">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">Datos del Trabajo</h2>
+                
+                <form id="calcForm" class="space-y-4">
+                    <!-- Sueldo Base / Imponible -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Sueldo Base Imponible ($)</label>
+                        <input type="number" id="sueldoBase" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Ej: 700000" required value="700000">
+                    </div>
+
+                    <!-- Tipo de Contrato -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Tipo de Contrato</label>
+                        <select id="tipoContrato" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="indefinido">Indefinido</option>
+                            <option value="plazo_fijo">Plazo Fijo / Por Obra</option>
+                        </select>
+                    </div>
+
+                    <!-- AFP -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">AFP del Trabajador</label>
+                        <select id="afp" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <option value="0.0046">UNO (0.46%) - Más económica</option>
+                            <option value="0.0058">Modelo (0.58%)</option>
+                            <option value="0.0116">PlanVital (1.16%)</option>
+                            <option value="0.0127">Habitat (1.27%)</option>
+                            <option value="0.0144">Capital (1.44%)</option>
+                            <option value="0.0145" selected>ProVida (1.45%)</option>
+                            <option value="0.0148">Cuprum (1.48%)</option>
+                        </select>
+                    </div>
+
+                    <!-- Gratificación Legal -->
+                    <div class="flex items-center space-x-2 pt-2">
+                        <input type="checkbox" id="gratificacion" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" checked>
+                        <label for="gratificacion" class="text-sm font-medium text-gray-700">Incluir Gratificación (25% con tope)</label>
+                    </div>
+
+                    <!-- Asignaciones No Imponibles -->
+                    <div class="pt-2">
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Colación + Movilización ($) <span class="text-xs text-gray-400 font-normal">(No Imponible)</span></label>
+                        <input type="number" id="noImponible" class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Ej: 50000" value="50000">
+                    </div>
+                </form>
+            </div>
+
+            <!-- RESULTADOS -->
+            <div class="space-y-6">
+                
+                <!-- Tarjeta Trabajador -->
+                <div class="bg-blue-50 p-6 rounded-xl border border-blue-200 shadow-sm">
+                    <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Perspectiva Trabajador</span>
+                    <h3 class="text-2xl font-black text-blue-900 mt-1">Sueldo Líquido Estimado</h3>
+                    <div class="text-4xl font-extrabold text-blue-600 my-2" id="resSueldoLiquido">$0</div>
+
+                    <div class="space-y-1.5 text-xs text-gray-600 border-t border-blue-200 pt-3 mt-3">
+                        <div class="flex justify-between"><span>Sueldo Imponible Total:</span> <span id="resTotalImponible" class="font-medium">$0</span></div>
+                        <div class="flex justify-between"><span>Descuento AFP (10% + comisión):</span> <span id="resDescuentoAFP" class="font-medium text-red-500">-$0</span></div>
+                        <div class="flex justify-between"><span>Descuento Salud (7% Fonasa/Base):</span> <span id="resDescuentoSalud" class="font-medium text-red-500">-$0</span></div>
+                        <div class="flex justify-between"><span>Seguro Cesantía Trabajador:</span> <span id="resDescuentoAFC" class="font-medium text-red-500">-$0</span></div>
+                        <div class="flex justify-between font-semibold text-gray-800 pt-1 border-t"><span>(+) No Imponibles:</span> <span id="resNoImponibles">$0</span></div>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Empleador / Pyme -->
+                <div class="bg-gray-900 text-white p-6 rounded-xl shadow-md">
+                    <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Perspectiva Empleador / Pyme</span>
+                    <h3 class="text-2xl font-bold mt-1">Costo Total Empresa</h3>
+                    <div class="text-4xl font-extrabold text-emerald-400 my-2" id="resCostoEmpresa">$0</div>
+
+                    <p class="text-xs text-gray-400 mb-3">Sueldo Bruto + Aportes Patronales en Previred:</p>
+
+                    <div class="space-y-1.5 text-xs text-gray-300 border-t border-gray-800 pt-3">
+                        <div class="flex justify-between"><span>Aporte Empresa AFC:</span> <span id="resEmpresaAFC">$0</span></div>
+                        <div class="flex justify-between"><span>SIS (Seguro Invalidez ~1.49%):</span> <span id="resEmpresaSIS">$0</span></div>
+                        <div class="flex justify-between"><span>Mutual de Seguridad (~0.93%):</span> <span id="resEmpresaMutual">$0</span></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE CÁLCULO -->
+    <script>
+        function calcular() {
+            // Entradas
+            const sueldoBase = parseFloat(document.getElementById('sueldoBase').value) || 0;
+            const tipoContrato = document.getElementById('tipoContrato').value;
+            const comisionAFP = parseFloat(document.getElementById('afp').value);
+            const tieneGratificacion = document.getElementById('gratificacion').checked;
+            const noImponible = parseFloat(document.getElementById('noImponible').value) || 0;
+
+            // 1. Gratificación Legal (25% con tope de 4.75 ingresos mínimos mensuales / 12)
+            // IMM aprox: $500.000 -> Tope mensual aprox: $197.916
+            let gratificacion = 0;
+            if (tieneGratificacion) {
+                const topeGratificacion = (500000 * 4.75) / 12;
+                gratificacion = Math.min(sueldoBase * 0.25, topeGratificacion);
+            }
+
+            const totalImponible = sueldoBase + gratificacion;
+
+            // 2. Descuentos Trabajador
+            const tasaAFP = 0.10 + comisionAFP;
+            const descAFP = totalImponible * tasaAFP;
+            const descSalud = totalImponible * 0.07; // 7% base Salud
+
+            // AFC Trabajador (0.6% en Indefinido, 0% en Plazo Fijo)
+            let descAFC = 0;
+            if (tipoContrato === 'indefinido') {
+                descAFC = totalImponible * 0.006;
+            }
+
+            const totalDescuentosTrabajador = descAFP + descSalud + descAFC;
+            const sueldoLiquido = (totalImponible - totalDescuentosTrabajador) + noImponible;
+
+            // 3. Aportes Empleador (Costo Empresa)
+            // AFC Empleador (2.4% en Indefinido, 3.0% en Plazo Fijo)
+            const tasaAFCEmpresa = (tipoContrato === 'indefinido') ? 0.024 : 0.030;
+            const aporteAFCEmpresa = totalImponible * tasaAFCEmpresa;
+            
+            const aporteSIS = totalImponible * 0.0149; // SIS aprox
+            const aporteMutual = totalImponible * 0.0093; // Mutual Base aprox
+
+            const totalAportesEmpresa = aporteAFCEmpresa + aporteSIS + aporteMutual;
+            const costoTotalEmpresa = totalImponible + noImponible + totalAportesEmpresa;
+
+            // Formateador de Moneda
+            const fmt = (num) => new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP', maximumFractionDigits: 0 }).format(num);
+
+            // Renderizado en la interfaz
+            document.getElementById('resSueldoLiquido').innerText = fmt(sueldoLiquido);
+            document.getElementById('resTotalImponible').innerText = fmt(totalImponible);
+            document.getElementById('resDescuentoAFP').innerText = '-' + fmt(descAFP);
+            document.getElementById('resDescuentoSalud').innerText = '-' + fmt(descSalud);
+            document.getElementById('resDescuentoAFC').innerText = '-' + fmt(descAFC);
+            document.getElementById('resNoImponibles').innerText = fmt(noImponible);
+
+            document.getElementById('resCostoEmpresa').innerText = fmt(costoTotalEmpresa);
+            document.getElementById('resEmpresaAFC').innerText = '+' + fmt(aporteAFCEmpresa);
+            document.getElementById('resEmpresaSIS').innerText = '+' + fmt(aporteSIS);
+            document.getElementById('resEmpresaMutual').innerText = '+' + fmt(aporteMutual);
+        }
+
+        // Eventos para actualizar en tiempo real mientras el usuario escribe/cambia opciones
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('input', calcular);
+            element.addEventListener('change', calcular);
+        });
+
+        // Ejecución inicial
+        calcular();
+    </script>
+</body>
+</html>
