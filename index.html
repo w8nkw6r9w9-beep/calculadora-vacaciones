@@ -1,0 +1,251 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2575.7">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  </style>
+</head>
+<body>
+<p class="p1">&lt;!DOCTYPE html&gt;</p>
+<p class="p1">&lt;html lang="es"&gt;</p>
+<p class="p1">&lt;head&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Calculadora de Vacaciones Proporcionales (Chile)&lt;/title&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>:root {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--primary: #2563eb;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--bg: #f8fafc;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--card: #ffffff;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--text: #1e293b;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>--border: #e2e8f0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>body {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background-color: var(--bg);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: var(--text);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>justify-content: center;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 20px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin: 0;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.container {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background: var(--card);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>max-width: 500px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 24px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>h2 {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 0;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: #0f172a;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.25rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.form-group {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>label {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: block;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.875rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 600;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 6px;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>input {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 10px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: 1px solid var(--border);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 6px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>box-sizing: border-box;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>button {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>width: 100%;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background-color: var(--primary);</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: white;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border: none;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-radius: 6px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: 600;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>cursor: pointer;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>transition: background 0.2s;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>button:hover {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>background-color: #1d4ed8;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.results {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 24px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding-top: 16px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-top: 1px solid var(--border);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.result-row {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>display: flex;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>justify-content: space-between;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 0.95rem;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>.total {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-weight: bold;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>font-size: 1.1rem;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>color: #16a34a;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 12px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>padding-top: 8px;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>border-top: 1px dashed var(--border);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
+<p class="p1">&lt;/head&gt;</p>
+<p class="p1">&lt;body&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;div class="container"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;h2&gt;Calculadora Vacaciones Proporcionales&lt;/h2&gt;</p>
+<p class="p2"><span class="Apple-converted-space">  </span></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="form-group"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;label for="fInicio"&gt;Fecha de Inicio de Contrato&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="date" id="fInicio" required&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="form-group"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;label for="fTermino"&gt;Fecha de Término de Contrato&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="date" id="fTermino" required&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="form-group"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;label for="sueldo"&gt;Sueldo Base / Promedio ($)&lt;/label&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;input type="number" id="sueldo" placeholder="Ej: 600000" min="0" required&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;button onclick="calcularFeriado()"&gt;Calcular Finiquito&lt;/button&gt;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;div class="results" id="resultados" style="display:none;"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="result-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;span&gt;Días Hábiles Proporcionales:&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;strong id="diasHabiles"&gt;0&lt;/strong&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="result-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;span&gt;Días Corridos (a pagar):&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;strong id="diasCorridos"&gt;0&lt;/strong&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="result-row"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;span&gt;Monto Diario (Sueldo/30):&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;strong id="montoDiario"&gt;$0&lt;/strong&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="result-row total"&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;span&gt;Total Feriado Proporcional:&lt;/span&gt;</p>
+<p class="p1"><span class="Apple-converted-space">      </span>&lt;strong id="montoTotal"&gt;$0&lt;/strong&gt;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>&lt;/div&gt;</p>
+<p class="p1">&lt;/div&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;script&gt;</p>
+<p class="p1"><span class="Apple-converted-space">  </span>// Feriados Nacionales Chile (Agrega o actualiza fechasYYYY-MM-DD según corresponda)</p>
+<p class="p1"><span class="Apple-converted-space">  </span>const feriadosChile = [</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// 2024</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"2024-01-01", "2024-03-29", "2024-05-01", "2024-05-21", "2024-06-20",<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>"2024-07-16", "2024-08-15", "2024-09-18", "2024-09-19", "2024-09-20",<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>"2024-10-31", "2024-11-01", "2024-12-25",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// 2025</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"2025-01-01", "2025-04-18", "2025-05-01", "2025-05-21", "2025-06-20",<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>"2025-07-16", "2025-08-15", "2025-09-18", "2025-09-19", "2025-10-31",<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>"2025-12-08", "2025-12-25",</p>
+<p class="p1"><span class="Apple-converted-space">    </span>// 2026</p>
+<p class="p1"><span class="Apple-converted-space">    </span>"2026-01-01", "2026-04-03", "2026-05-01", "2026-05-21", "2026-06-29",<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>"2026-07-16", "2026-09-18", "2026-10-12", "2026-12-08", "2026-12-25"</p>
+<p class="p1"><span class="Apple-converted-space">  </span>];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function esFeriado(fechaStr) {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>return feriadosChile.includes(fechaStr);</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">  </span>function calcularFeriado() {</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const inicioStr = document.getElementById('fInicio').value;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const terminoStr = document.getElementById('fTermino').value;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const sueldo = parseFloat(document.getElementById('sueldo').value);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (!inicioStr || !terminoStr || isNaN(sueldo) || sueldo &lt;= 0) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>alert("Por favor completa todos los campos correctamente.");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>const inicio = new Date(inicioStr + 'T00:00:00');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const termino = new Date(terminoStr + 'T00:00:00');</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>if (termino &lt; inicio) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>alert("La fecha de término no puede ser anterior a la fecha de inicio.");</p>
+<p class="p1"><span class="Apple-converted-space">      </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// 1. Calcular días totales trabajados</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const diffTime = Math.abs(termino - inicio);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const diasTrabajados = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1; // Incluye ambos días</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// 2. Días hábiles acumulados (15 / 365 = 0.04109589 por día)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const diasHabilesAcc = diasTrabajados * (15 / 365);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// 3. Proyección en el calendario partiendo desde el día siguiente al término</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let fechaAux = new Date(termino);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>fechaAux.setDate(fechaAux.getDate() + 1);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>let habilesContados = 0;</p>
+<p class="p2"><span class="Apple-converted-space">    </span></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Sumar días hábiles en el calendario saltando fines de semana y feriados</p>
+<p class="p1"><span class="Apple-converted-space">    </span>while (habilesContados &lt; diasHabilesAcc) {</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const diaSemana = fechaAux.getDay(); // 0 = Dom, 6 = Sáb</p>
+<p class="p1"><span class="Apple-converted-space">      </span>const fechaIso = fechaAux.toISOString().split('T')[0];</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Si es de lunes a viernes (1 a 5) y NO es feriado registrado</p>
+<p class="p1"><span class="Apple-converted-space">      </span>if (diaSemana !== 0 &amp;&amp; diaSemana !== 6 &amp;&amp; !esFeriado(fechaIso)) {</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Si falta menos de 1 día entero de fracción habiles</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (diasHabilesAcc - habilesContados &lt; 1) {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>habilesContados = diasHabilesAcc; // completado</p>
+<p class="p1"><span class="Apple-converted-space">          </span>break;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">          </span>habilesContados += 1;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>}</p>
+<p class="p1"><span class="Apple-converted-space">      </span>// Avanzar al siguiente día</p>
+<p class="p1"><span class="Apple-converted-space">      </span>fechaAux.setDate(fechaAux.getDate() + 1);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// 4. Determinar días corridos a pagar (Diferencia de días entre fecha de término y fecha proyección)</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const diffCorridos = Math.abs(fechaAux - termino);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>let diasCorridos = Math.ceil(diffCorridos / (1000 * 60 * 60 * 24));</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Si la fracción restante es menor a un día hábil completo, mantenemos precisión</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const fraccionDiasCorridos = (diasCorridos - 1) + (diasHabilesAcc % 1);</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// 5. Cálculo monetario</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const valorDiario = sueldo / 30;</p>
+<p class="p1"><span class="Apple-converted-space">    </span>const totalPagar = fraccionDiasCorridos * valorDiario;</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">    </span>// Mostrar resultados</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('diasHabiles').innerText = diasHabilesAcc.toFixed(2);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('diasCorridos').innerText = fraccionDiasCorridos.toFixed(2);</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('montoDiario').innerText = '$' + Math.round(valorDiario).toLocaleString('es-CL');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('montoTotal').innerText = '$' + Math.round(totalPagar).toLocaleString('es-CL');</p>
+<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById('resultados').style.display = 'block';</p>
+<p class="p1"><span class="Apple-converted-space">  </span>}</p>
+<p class="p1">&lt;/script&gt;</p>
+<p class="p2"><br></p>
+<p class="p1">&lt;/body&gt;</p>
+<p class="p1">&lt;/html&gt;</p>
+</body>
+</html>
