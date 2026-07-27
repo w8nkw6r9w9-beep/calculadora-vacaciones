@@ -253,11 +253,109 @@
       text-align: center;
       margin-top: 14px;
     }
+    /* ---------- Hero + estilo visual inspirado en calculadorafiniquito.cl ---------- */
+    .page-wrap {
+      width: 100%;
+      max-width: 540px;
+      margin: 0 auto;
+    }
+    .hero {
+      background: linear-gradient(135deg, #0f172a, #1e3a8a);
+      color: #fff;
+      border-radius: 14px;
+      padding: 28px 24px;
+      text-align: center;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 25px -8px rgba(15,23,42,0.45);
+    }
+    .hero h1 {
+      font-size: 1.45rem;
+      margin: 0 0 8px 0;
+      letter-spacing: 0.2px;
+      line-height: 1.3;
+    }
+    .hero p {
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      margin: 0;
+      line-height: 1.5;
+    }
+    .uf-ticker {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.18);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      margin-top: 14px;
+      color: #e2e8f0;
+    }
+    .uf-ticker strong { color: #93c5fd; }
+    .section-num {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 26px 0 14px 0;
+    }
+    .form-group + .section-num,
+    .section-num:first-of-type {
+      margin-top: 22px;
+    }
+    .section-num .num-badge {
+      width: 24px;
+      height: 24px;
+      min-width: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .section-num .section-label {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #0f172a;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-size: 1rem;
+      background: #fff;
+      color: var(--text);
+    }
+    .causal-note {
+      display: none;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      color: #92400e;
+      font-size: 0.8rem;
+      line-height: 1.45;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin: 8px 0 0 0;
+    }
+    .causal-note strong { color: #78350f; }
+    button {
+      background: linear-gradient(135deg, #2563eb, #1e3a8a) !important;
+    }
+    button:hover {
+      background: linear-gradient(135deg, #1d4ed8, #172554) !important;
+    }
     @media print {
       body { background: white; padding: 0; }
       .container { box-shadow: none; border: none; max-width: 100%; padding: 0; }
-      .no-print, .form-group, .checkbox-group, .optional-box, .autor-line,
-      .info-icon, .info-box, .uf-info { display: none !important; }
+      .no-print, .hero, .form-group, .checkbox-group, .optional-box, .autor-line,
+      .info-icon, .info-box, .uf-info, .section-num, .causal-note { display: none !important; }
       .print-only { display: block; }
       .results { border-top: none; margin-top: 0; padding-top: 0; }
       h2 { text-align: left; }
@@ -265,10 +363,17 @@
   </style>
 </head>
 <body>
+<div class="page-wrap">
+  <div class="hero no-print">
+    <h1>El cálculo exacto de tu finiquito.</h1>
+    <p>Vacaciones proporcionales, indemnización por años de servicio, aviso previo y recargo — calculados según la causal real de término y el Código del Trabajo.</p>
+    <div class="uf-ticker">UF hoy: <strong id="ufTicker">Cargando…</strong> · mindicador.cl</div>
+  </div>
 <div class="container">
   <h2>Calculadora de Finiquito (Chile)</h2>
   <p class="autor-line">Por <a href="israel-gomez-contador.html">Israel Gómez, Contador Auditor</a></p>
 
+  <div class="section-num"><span class="num-badge">1</span><span class="section-label">Fechas y causal de término</span></div>
   <div class="form-group">
     <label for="fInicio">Fecha de Ingreso de Trabajo</label>
     <input type="date" id="fInicio" required>
@@ -277,6 +382,31 @@
     <label for="fTermino">Fecha de Finiquito / Desvinculación</label>
     <input type="date" id="fTermino" required>
   </div>
+  <div class="form-group">
+    <label for="causal">Causal de Término
+      <span class="info-icon" onclick="toggleInfo('infoCausal')">?</span>
+    </label>
+    <select id="causal" onchange="actualizarModulos()">
+      <option value="renuncia">Renuncia voluntaria — Art. 159 N°2</option>
+      <option value="mutuo">Mutuo acuerdo — Art. 159 N°1</option>
+      <option value="plazo_fijo">Vencimiento de contrato a plazo fijo — Art. 159 N°4</option>
+      <option value="conclusion">Conclusión del trabajo o servicio — Art. 159 N°5</option>
+      <option value="caso_fortuito">Caso fortuito o fuerza mayor — Art. 159 N°6</option>
+      <option value="despido_160">Despido disciplinario / falta grave — Art. 160</option>
+      <option value="necesidades" selected>Necesidades de la empresa (despido) — Art. 161 N°1</option>
+      <option value="desahucio">Desahucio (cargo de confianza) — Art. 161 N°2</option>
+    </select>
+    <div class="info-box" id="infoCausal">
+      La causal define qué conceptos corresponden. La <strong>indemnización por años de servicio</strong>
+      y el <strong>aviso previo</strong> solo se pagan cuando el término es por <strong>necesidades de la
+      empresa</strong> o <strong>desahucio</strong> (Art. 161). En renuncia, mutuo acuerdo, vencimiento de
+      contrato, conclusión del trabajo/servicio, caso fortuito o despido por falta grave (Art. 159 y 160),
+      esos dos conceptos no corresponden: solo se pagan vacaciones y remuneraciones pendientes.
+    </div>
+    <div class="causal-note" id="causalNote"></div>
+  </div>
+
+  <div class="section-num"><span class="num-badge">2</span><span class="section-label">Remuneración</span></div>
   <div class="form-group">
     <label for="sueldoVacaciones">Sueldo Base Mensual ($) <small>(Para Vacaciones)</small>
       <span class="info-icon" onclick="toggleInfo('infoSueldoBase')">?</span>
@@ -288,22 +418,16 @@
       <strong>promediando los últimos 3 meses trabajados</strong>. No incluyas la gratificación.
     </div>
   </div>
+
+  <div class="section-num"><span class="num-badge">3</span><span class="section-label">Vacaciones y otros haberes</span></div>
   <div class="form-group">
     <label for="diasTomados">Días de Vacaciones Tomados (Hábiles)</label>
     <input type="number" id="diasTomados" placeholder="Ej: 0" min="0" step="1" value="0" inputmode="numeric">
   </div>
-  <!-- Opciones de módulos adicionales -->
-  <div class="checkbox-group">
-    <input type="checkbox" id="chkIas" onchange="actualizarModulos()">
-    <label for="chkIas">Incluir Indemnización por Años de Servicio</label>
-  </div>
-  <div class="checkbox-group">
-    <input type="checkbox" id="chkAviso" onchange="actualizarModulos()">
-    <label for="chkAviso">Incluir Indemnización Sustitutiva de Aviso Previo</label>
-  </div>
-  <div class="checkbox-group">
+  <!-- Recargo (solo aplica si un tribunal declara el despido injustificado/improcedente) -->
+  <div class="checkbox-group" id="wrapRecargo" style="display:none;">
     <input type="checkbox" id="chkRecargo" onchange="actualizarModulos()">
-    <label for="chkRecargo">Incluir Recargo por Despido Injustificado</label>
+    <label for="chkRecargo">Un tribunal declaró el despido injustificado / improcedente (recargo)</label>
   </div>
   <div class="optional-box" id="boxIas" style="display: none;">
     <div class="form-group">
@@ -366,6 +490,7 @@
     <div class="card-detail">
       <p>⏱️ <strong>Tiempo Trabajado:</strong> <span id="antiguedadText"></span></p>
       <p>📅 <strong>Periodo Proporcional:</strong> <span id="periodoText"></span></p>
+      <p>⚖️ <strong>Causal de Término:</strong> <span id="causalText"></span></p>
     </div>
     <div class="section-title">VACACIONES PROPORCIONALES
       <span class="info-icon" onclick="toggleInfo('infoVacacionesCalc')">?</span>
@@ -480,6 +605,7 @@
     <p class="print-only disclaimer">Este informe es una estimación referencial elaborada con fines de comparación y no reemplaza el documento legal de finiquito ni constituye asesoría profesional vinculante.</p>
   </div>
 </div>
+</div>
 <script>
   const feriadosChile = [
     "2024-01-01", "2024-03-29", "2024-05-01", "2024-05-21", "2024-06-20",
@@ -501,13 +627,58 @@
   function redondearExcel(val, dec = 2) {
     return Number(Math.round(val + 'e' + dec) + 'e-' + dec);
   }
+
+  // ---------- Causales de término (Código del Trabajo) ----------
+  // Solo Art. 161 (necesidades de la empresa / desahucio) da derecho a
+  // indemnización por años de servicio y a aviso previo. Las causales del
+  // Art. 159 y el Art. 160 no las incluyen — salvo que un tribunal declare
+  // el despido injustificado/improcedente (Art. 168), caso en el que sí
+  // corresponden ambas indemnizaciones, con recargo.
+  const CAUSALES = {
+    renuncia:      { label: 'Renuncia voluntaria', articulo: 'Art. 159 N°2', grantsIas: false, grantsAviso: false, allowsRecargo: false },
+    mutuo:         { label: 'Mutuo acuerdo', articulo: 'Art. 159 N°1', grantsIas: false, grantsAviso: false, allowsRecargo: false },
+    plazo_fijo:    { label: 'Vencimiento de contrato a plazo fijo', articulo: 'Art. 159 N°4', grantsIas: false, grantsAviso: false, allowsRecargo: false },
+    conclusion:    { label: 'Conclusión del trabajo o servicio', articulo: 'Art. 159 N°5', grantsIas: false, grantsAviso: false, allowsRecargo: false },
+    caso_fortuito: { label: 'Caso fortuito o fuerza mayor', articulo: 'Art. 159 N°6', grantsIas: false, grantsAviso: false, allowsRecargo: false },
+    despido_160:   { label: 'Despido disciplinario / falta grave', articulo: 'Art. 160', grantsIas: false, grantsAviso: false, allowsRecargo: true },
+    necesidades:   { label: 'Necesidades de la empresa', articulo: 'Art. 161 N°1', grantsIas: true, grantsAviso: true, allowsRecargo: true },
+    desahucio:     { label: 'Desahucio (cargo de confianza)', articulo: 'Art. 161 N°2', grantsIas: true, grantsAviso: true, allowsRecargo: true }
+  };
+  function causalActual() {
+    const val = document.getElementById('causal').value;
+    return CAUSALES[val] || CAUSALES.necesidades;
+  }
+
   function actualizarModulos() {
-    const chkIas = document.getElementById('chkIas').checked;
-    const chkAviso = document.getElementById('chkAviso').checked;
-    const chkRecargo = document.getElementById('chkRecargo').checked;
-    document.getElementById('boxIas').style.display = (chkIas || chkAviso || chkRecargo) ? 'block' : 'none';
-    document.getElementById('grupoAviso').style.display = chkAviso ? 'block' : 'none';
-    document.getElementById('grupoRecargo').style.display = chkRecargo ? 'block' : 'none';
+    const cfg = causalActual();
+    const chkRecargo = document.getElementById('chkRecargo');
+
+    document.getElementById('wrapRecargo').style.display = cfg.allowsRecargo ? 'flex' : 'none';
+    if (!cfg.allowsRecargo) chkRecargo.checked = false;
+
+    const recargoActivo = cfg.allowsRecargo && chkRecargo.checked;
+    const efectivoIas = cfg.grantsIas || recargoActivo;
+    const efectivoAviso = cfg.grantsAviso || recargoActivo;
+
+    document.getElementById('boxIas').style.display = (efectivoIas || efectivoAviso) ? 'block' : 'none';
+    document.getElementById('grupoAviso').style.display = efectivoAviso ? 'block' : 'none';
+    document.getElementById('grupoRecargo').style.display = recargoActivo ? 'block' : 'none';
+
+    const nota = document.getElementById('causalNote');
+    if (!cfg.grantsIas && !recargoActivo) {
+      nota.style.display = 'block';
+      nota.innerHTML = `Con <strong>${cfg.label} (${cfg.articulo})</strong> no corresponde indemnización por ` +
+        `años de servicio ni aviso previo. Solo se pagan vacaciones proporcionales, pendientes y ` +
+        `remuneraciones adeudadas.` +
+        (cfg.allowsRecargo ? ' Si un tribunal llegara a declarar este despido injustificado o improcedente, marca la casilla de abajo: ahí sí se activan ambas indemnizaciones, con recargo (Art. 168).' : '');
+    } else if (recargoActivo && !cfg.grantsIas) {
+      nota.style.display = 'block';
+      nota.innerHTML = `Como marcaste que el despido fue declarado injustificado/improcedente, ahora sí ` +
+        `corresponden <strong>indemnización por años de servicio</strong> y <strong>aviso previo</strong>, ` +
+        `más el recargo (Art. 168).`;
+    } else {
+      nota.style.display = 'none';
+    }
   }
 
   // Muestra/oculta los recuadros de ayuda ("?") junto a campos y secciones
@@ -519,6 +690,7 @@
   // Trae el valor UF vigente desde la API pública de mindicador.cl
   async function cargarValorUF() {
     const info = document.getElementById('ufInfo');
+    const ticker = document.getElementById('ufTicker');
     try {
       const res = await fetch('https://mindicador.cl/api/uf');
       if (!res.ok) throw new Error('Respuesta no OK');
@@ -529,13 +701,18 @@
       const fecha = new Date(ultimo.fecha).toLocaleDateString('es-CL');
       info.textContent = `Valor UF actualizado automáticamente (${fecha}).`;
       info.className = 'uf-info ok';
+      if (ticker) ticker.textContent = '$' + Math.round(ultimo.valor).toLocaleString('es-CL');
     } catch (err) {
       document.getElementById('valorUf').value = VALOR_UF_RESPALDO;
       info.textContent = 'No se pudo obtener el valor UF en línea. Se usó un valor de respaldo; verifícalo manualmente.';
       info.className = 'uf-info error';
+      if (ticker) ticker.textContent = '$' + Math.round(VALOR_UF_RESPALDO).toLocaleString('es-CL') + ' (respaldo)';
     }
   }
-  window.addEventListener('DOMContentLoaded', cargarValorUF);
+  window.addEventListener('DOMContentLoaded', () => {
+    cargarValorUF();
+    actualizarModulos();
+  });
 
   function calcularFiniquito() {
     const inicioStr = document.getElementById('fInicio').value;
@@ -552,13 +729,10 @@
       alert("La fecha de término no puede ser anterior a la de inicio.");
       return;
     }
-    const incluyeIas = document.getElementById('chkIas').checked;
-    const incluyeAviso = document.getElementById('chkAviso').checked;
-    const incluyeRecargo = document.getElementById('chkRecargo').checked;
-    if (incluyeRecargo && !incluyeIas) {
-      alert("El recargo por despido injustificado se aplica sobre la indemnización por años de servicio. Marca también esa casilla para poder calcularlo.");
-      return;
-    }
+    const cfgCausal = causalActual();
+    const incluyeRecargo = cfgCausal.allowsRecargo && document.getElementById('chkRecargo').checked;
+    const incluyeIas = cfgCausal.grantsIas || incluyeRecargo;
+    const incluyeAviso = cfgCausal.grantsAviso || incluyeRecargo;
     // 1. ANTIGÜEDAD
     let y1 = inicio.getFullYear(), m1 = inicio.getMonth(), d1 = inicio.getDate();
     let y2 = termino.getFullYear(), m2 = termino.getMonth(), d2 = termino.getDate();
@@ -651,6 +825,8 @@
     document.getElementById('antiguedadText').innerText = textoTiempo.join(', ') || '1 día';
     document.getElementById('periodoText').innerText =
       `${inicio.toLocaleDateString('es-CL')} al ${termino.toLocaleDateString('es-CL')}`;
+    document.getElementById('causalText').innerText =
+      `${cfgCausal.label} (${cfgCausal.articulo})` + (incluyeRecargo ? ' — declarado injustificado/improcedente' : '');
 
     document.getElementById('diasGenerados').innerText = diasGeneradosAcc.toFixed(2);
     const warningBox = document.getElementById('warningExceso');
