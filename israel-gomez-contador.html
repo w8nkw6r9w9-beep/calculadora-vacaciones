@@ -100,6 +100,40 @@
     display: block;
   }
 
+  .tarifas-intro {
+    max-width: 700px;
+    font-size: 1rem;
+    color: var(--gris-texto);
+  }
+  .price-card {
+    display: flex;
+    flex-direction: column;
+  }
+  .price-card p:not(.price) { flex-grow: 1; }
+  .price-card .price {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: var(--azul-oscuro);
+    margin: 14px 0 16px 0;
+  }
+  .price-card .price span {
+    font-size: 0.85rem;
+    font-weight: normal;
+    color: var(--gris-texto);
+  }
+  .cta-btn {
+    display: inline-block;
+    background: #25D366;
+    color: var(--blanco);
+    text-decoration: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+  }
+  .cta-btn:hover { background: #1ebe5a; }
+
   .why {
     background: var(--gris-claro);
   }
@@ -256,9 +290,11 @@
 
 <nav>
   <a href="#servicios">Servicios</a>
+  <a href="#tarifas">Tarifas</a>
   <a href="#por-que">¿Por qué contratar un contador?</a>
   <a href="#sobre-mi">Sobre mí</a>
   <a href="#contacto">Contacto</a>
+  <a href="index.html">Calculadora de Finiquito</a>
 </nav>
 
 <img class="hero-photo" src="https://images.pexels.com/photos/6694492/pexels-photo-6694492.jpeg?auto=compress&cs=tinysrgb&w=1600&h=500&fit=crop" alt="Contador trabajando en laptop con documentos financieros">
@@ -273,33 +309,66 @@
   <div class="grid">
     <div class="card">
       <span class="icon">📊</span>
-      <h3>Contabilidad general</h3>
-      <p>Registro de operaciones, conciliaciones bancarias y elaboración de libros contables al día.</p>
-    </div>
-    <div class="card">
-      <span class="icon">📑</span>
-      <h3>Estados financieros</h3>
-      <p>Balance general, estado de resultados y flujo de efectivo para conocer la salud real de tu negocio.</p>
+      <h3>Contabilidad general y balances</h3>
+      <p>Registro de operaciones, libros contables al día y elaboración de balances.</p>
     </div>
     <div class="card">
       <span class="icon">🧾</span>
-      <h3>Impuestos y cumplimiento fiscal</h3>
-      <p>Cálculo, declaración y presentación de impuestos en tiempo, evitando multas y recargos.</p>
+      <h3>Impuestos y declaraciones</h3>
+      <p>Declaración mensual de impuestos (F29), declaración de renta (F22) y declaraciones juradas.</p>
     </div>
     <div class="card">
       <span class="icon">💼</span>
-      <h3>Nómina</h3>
-      <p>Cálculo de sueldos, prestaciones y obligaciones patronales de forma precisa y puntual.</p>
+      <h3>Remuneraciones</h3>
+      <p>Cálculo de liquidaciones de sueldo mensuales, de forma precisa y puntual.</p>
     </div>
     <div class="card">
-      <span class="icon">📈</span>
-      <h3>Asesoría financiera</h3>
-      <p>Análisis de costos, rentabilidad y proyecciones para apoyar la toma de decisiones.</p>
+      <span class="icon">📝</span>
+      <h3>Contratos y finiquitos</h3>
+      <p>Redacción de contratos de trabajo y cálculo/redacción de finiquitos.</p>
+    </div>
+    <div class="card">
+      <span class="icon">⚖️</span>
+      <h3>Previred y Dirección del Trabajo</h3>
+      <p>Cumplimiento y trámites en línea ante ambas instituciones en materia laboral.</p>
     </div>
     <div class="card">
       <span class="icon">🏢</span>
       <h3>Constitución de empresas</h3>
-      <p>Acompañamiento contable desde el inicio de tu empresa: régimen fiscal, registros y trámites.</p>
+      <p>Inicio de actividades y constitución, acompañamiento contable desde el día uno.</p>
+    </div>
+    <div class="card">
+      <span class="icon">📥</span>
+      <h3>Control de facturas</h3>
+      <p>Orden y reporte de facturas de compra y venta, para que sepas exactamente qué debes y qué te deben.</p>
+    </div>
+  </div>
+</section>
+
+<section id="tarifas" class="tarifas">
+  <h2>Planes y tarifas</h2>
+  <p class="tarifas-intro">Precios referenciales — el valor final se ajusta según el tamaño y las necesidades de tu empresa.</p>
+  <div class="grid">
+    <div class="card price-card">
+      <span class="icon">📊</span>
+      <h3>Plan de Contabilidad</h3>
+      <p>Declaración mensual de impuestos, renta anual, declaraciones juradas, balances, inicio de actividades y constitución de empresas.</p>
+      <p class="price">Desde $50.000<span>/mes</span></p>
+      <a class="cta-btn" href="https://wa.me/56981479748?text=Hola%20Israel%2C%20quiero%20cotizar%20el%20Plan%20de%20Contabilidad" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
+    </div>
+    <div class="card price-card">
+      <span class="icon">💼</span>
+      <h3>Remuneraciones y Asesoría Laboral</h3>
+      <p>Contratos de trabajo, finiquitos, liquidaciones de sueldo y cumplimiento ante Previred y la Dirección del Trabajo.</p>
+      <p class="price">Desde $10.000<span>/trabajador al mes</span></p>
+      <a class="cta-btn" href="https://wa.me/56981479748?text=Hola%20Israel%2C%20quiero%20cotizar%20Remuneraciones" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
+    </div>
+    <div class="card price-card">
+      <span class="icon">🧾</span>
+      <h3>Control de Facturas</h3>
+      <p>Orden y reporte de facturas de compra y venta pendientes, para saber qué debes y qué te deben.</p>
+      <p class="price">Desde $25.000<span>/mes</span></p>
+      <a class="cta-btn" href="https://wa.me/56981479748?text=Hola%20Israel%2C%20quiero%20cotizar%20Control%20de%20Facturas" target="_blank" rel="noopener">Cotizar por WhatsApp</a>
     </div>
   </div>
 </section>
