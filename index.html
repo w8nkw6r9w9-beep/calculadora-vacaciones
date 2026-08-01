@@ -387,21 +387,41 @@
       <span class="info-icon" onclick="toggleInfo('infoCausal')">?</span>
     </label>
     <select id="causal" onchange="actualizarModulos()">
-      <option value="renuncia">Renuncia voluntaria — Art. 159 N°2</option>
-      <option value="mutuo">Mutuo acuerdo — Art. 159 N°1</option>
-      <option value="plazo_fijo">Vencimiento de contrato a plazo fijo — Art. 159 N°4</option>
-      <option value="conclusion">Conclusión del trabajo o servicio — Art. 159 N°5</option>
-      <option value="caso_fortuito">Caso fortuito o fuerza mayor — Art. 159 N°6</option>
-      <option value="despido_160">Despido disciplinario / falta grave — Art. 160</option>
-      <option value="necesidades" selected>Necesidades de la empresa (despido) — Art. 161 N°1</option>
-      <option value="desahucio">Desahucio (cargo de confianza) — Art. 161 N°2</option>
+      <optgroup label="Art. 159 — Terminación sin indemnización">
+        <option value="mutuo">N°1 · Mutuo acuerdo de las partes</option>
+        <option value="renuncia">N°2 · Renuncia voluntaria (aviso 30 días)</option>
+        <option value="muerte">N°3 · Muerte del trabajador</option>
+        <option value="plazo_fijo">N°4 · Vencimiento del plazo convenido (contrato a plazo fijo)</option>
+        <option value="conclusion">N°5 · Conclusión del trabajo o servicio</option>
+        <option value="caso_fortuito">N°6 · Caso fortuito o fuerza mayor</option>
+      </optgroup>
+      <optgroup label="Art. 160 — Despido por conducta del trabajador (sin indemnización)">
+        <option value="falta_probidad">N°1 · Falta de probidad, acoso, injurias o conducta inmoral</option>
+        <option value="negociaciones">N°2 · Negociaciones prohibidas por el contrato</option>
+        <option value="inasistencia">N°3 · Inasistencia injustificada al trabajo</option>
+        <option value="abandono">N°4 · Abandono del trabajo</option>
+        <option value="imprudencia">N°5 · Actos, omisiones o imprudencias temerarias</option>
+        <option value="perjuicio_material">N°6 · Perjuicio material causado intencionalmente</option>
+        <option value="incumplimiento_grave">N°7 · Incumplimiento grave de las obligaciones del contrato</option>
+      </optgroup>
+      <optgroup label="Art. 161 — Con indemnización">
+        <option value="necesidades" selected>Inciso 1 · Necesidades de la empresa (despido)</option>
+        <option value="desahucio">Inciso 2 · Desahucio (cargo de confianza)</option>
+      </optgroup>
+      <optgroup label="Art. 161 bis">
+        <option value="invalidez">Invalidez del trabajador (incapacidad física o mental)</option>
+      </optgroup>
+      <optgroup label="Art. 171 — Autodespido">
+        <option value="autodespido">Autodespido / despido indirecto (incumplimiento grave del empleador)</option>
+      </optgroup>
     </select>
     <div class="info-box" id="infoCausal">
       La causal define qué conceptos corresponden. La <strong>indemnización por años de servicio</strong>
       y el <strong>aviso previo</strong> solo se pagan cuando el término es por <strong>necesidades de la
-      empresa</strong> o <strong>desahucio</strong> (Art. 161). En renuncia, mutuo acuerdo, vencimiento de
-      contrato, conclusión del trabajo/servicio, caso fortuito o despido por falta grave (Art. 159 y 160),
-      esos dos conceptos no corresponden: solo se pagan vacaciones y remuneraciones pendientes.
+      empresa</strong> o <strong>desahucio</strong> (Art. 161), por <strong>invalidez</strong> (Art. 161 bis,
+      sin aviso previo) o por <strong>autodespido</strong> validado (Art. 171). En las demás causales del
+      Art. 159 y 160 esos dos conceptos no corresponden — solo se pagan vacaciones y remuneraciones
+      pendientes, salvo que un tribunal declare el despido injustificado o improcedente.
     </div>
     <div class="causal-note" id="causalNote"></div>
   </div>
@@ -628,6 +648,44 @@
     return Number(Math.round(val + 'e' + dec) + 'e-' + dec);
   }
 
+  // ---------- Antigüedad: misma lógica que tu planilla (equivalente a SIFECHA/DATEDIF) ----------
+  // Años  = SIFECHA(inicio;termino;"Y")
+  // Meses = SIFECHA(inicio;termino;"YM") + ajuste
+  // Días  = SI(O(MD=30;MD=31);0;MD)   -> si el resto de días da 30 o 31, se cuenta
+  //         como un mes completo adicional (ajuste=1) y los días quedan en 0.
+  function diasEnMesAnterior(fecha) {
+    return new Date(fecha.getFullYear(), fecha.getMonth(), 0).getDate();
+  }
+  function datedifY(inicio, termino) {
+    let y = termino.getFullYear() - inicio.getFullYear();
+    const aniversario = new Date(termino.getFullYear(), inicio.getMonth(), inicio.getDate());
+    if (termino < aniversario) y--;
+    return y;
+  }
+  function datedifYM(inicio, termino) {
+    let m = (termino.getFullYear() - inicio.getFullYear()) * 12 + (termino.getMonth() - inicio.getMonth());
+    if (termino.getDate() < inicio.getDate()) m--;
+    m = ((m % 12) + 12) % 12;
+    return m;
+  }
+  function datedifMD(inicio, termino) {
+    let d = termino.getDate() - inicio.getDate();
+    if (d < 0) d += diasEnMesAnterior(termino);
+    return d;
+  }
+  function calcularAntiguedad(inicio, termino) {
+    const anios = datedifY(inicio, termino);
+    const mesesBase = datedifYM(inicio, termino);
+    const diasBase = datedifMD(inicio, termino);
+    const ajuste = (diasBase === 30 || diasBase === 31) ? 1 : 0;
+    // Nota: cuando la fecha de ingreso cae el día 31 y el término cruza un mes
+    // corto (ej. hacia febrero), la resta de días puede dar un valor negativo
+    // por el mismo comportamiento conocido de esta fórmula en Excel/Sheets.
+    // Se deja en 0 como resguardo, ya que un día negativo no tiene sentido a la vista.
+    const dias = ajuste ? 0 : Math.max(diasBase, 0);
+    return { anios, meses: mesesBase + ajuste, dias };
+  }
+
   // ---------- Causales de término (Código del Trabajo) ----------
   // Solo Art. 161 (necesidades de la empresa / desahucio) da derecho a
   // indemnización por años de servicio y a aviso previo. Las causales del
@@ -635,14 +693,28 @@
   // el despido injustificado/improcedente (Art. 168), caso en el que sí
   // corresponden ambas indemnizaciones, con recargo.
   const CAUSALES = {
-    renuncia:      { label: 'Renuncia voluntaria', articulo: 'Art. 159 N°2', grantsIas: false, grantsAviso: false, allowsRecargo: false },
-    mutuo:         { label: 'Mutuo acuerdo', articulo: 'Art. 159 N°1', grantsIas: false, grantsAviso: false, allowsRecargo: false },
-    plazo_fijo:    { label: 'Vencimiento de contrato a plazo fijo', articulo: 'Art. 159 N°4', grantsIas: false, grantsAviso: false, allowsRecargo: false },
-    conclusion:    { label: 'Conclusión del trabajo o servicio', articulo: 'Art. 159 N°5', grantsIas: false, grantsAviso: false, allowsRecargo: false },
-    caso_fortuito: { label: 'Caso fortuito o fuerza mayor', articulo: 'Art. 159 N°6', grantsIas: false, grantsAviso: false, allowsRecargo: false },
-    despido_160:   { label: 'Despido disciplinario / falta grave', articulo: 'Art. 160', grantsIas: false, grantsAviso: false, allowsRecargo: true },
-    necesidades:   { label: 'Necesidades de la empresa', articulo: 'Art. 161 N°1', grantsIas: true, grantsAviso: true, allowsRecargo: true },
-    desahucio:     { label: 'Desahucio (cargo de confianza)', articulo: 'Art. 161 N°2', grantsIas: true, grantsAviso: true, allowsRecargo: true }
+    // Art. 159 — término sin derecho a indemnización
+    mutuo:                { label: 'Mutuo acuerdo de las partes', articulo: 'Art. 159 N°1', grantsIas: false, grantsAviso: false, allowsRecargo: false },
+    renuncia:              { label: 'Renuncia voluntaria', articulo: 'Art. 159 N°2', grantsIas: false, grantsAviso: false, allowsRecargo: false },
+    muerte:                { label: 'Muerte del trabajador', articulo: 'Art. 159 N°3', grantsIas: false, grantsAviso: false, allowsRecargo: false },
+    plazo_fijo:            { label: 'Vencimiento del plazo convenido', articulo: 'Art. 159 N°4', grantsIas: false, grantsAviso: false, allowsRecargo: false },
+    conclusion:            { label: 'Conclusión del trabajo o servicio', articulo: 'Art. 159 N°5', grantsIas: false, grantsAviso: false, allowsRecargo: false },
+    caso_fortuito:         { label: 'Caso fortuito o fuerza mayor', articulo: 'Art. 159 N°6', grantsIas: false, grantsAviso: false, allowsRecargo: false },
+    // Art. 160 — despido por conducta del trabajador (sin indemnización, salvo que se declare injustificado)
+    falta_probidad:        { label: 'Falta de probidad, acoso, injurias o conducta inmoral', articulo: 'Art. 160 N°1', grantsIas: false, grantsAviso: false, allowsRecargo: true },
+    negociaciones:         { label: 'Negociaciones prohibidas por el contrato', articulo: 'Art. 160 N°2', grantsIas: false, grantsAviso: false, allowsRecargo: true },
+    inasistencia:          { label: 'Inasistencia injustificada al trabajo', articulo: 'Art. 160 N°3', grantsIas: false, grantsAviso: false, allowsRecargo: true },
+    abandono:              { label: 'Abandono del trabajo', articulo: 'Art. 160 N°4', grantsIas: false, grantsAviso: false, allowsRecargo: true },
+    imprudencia:           { label: 'Actos, omisiones o imprudencias temerarias', articulo: 'Art. 160 N°5', grantsIas: false, grantsAviso: false, allowsRecargo: true },
+    perjuicio_material:    { label: 'Perjuicio material causado intencionalmente', articulo: 'Art. 160 N°6', grantsIas: false, grantsAviso: false, allowsRecargo: true },
+    incumplimiento_grave:  { label: 'Incumplimiento grave de las obligaciones del contrato', articulo: 'Art. 160 N°7', grantsIas: false, grantsAviso: false, allowsRecargo: true },
+    // Art. 161 — con indemnización
+    necesidades:           { label: 'Necesidades de la empresa', articulo: 'Art. 161 inciso 1', grantsIas: true, grantsAviso: true, allowsRecargo: true },
+    desahucio:             { label: 'Desahucio (cargo de confianza)', articulo: 'Art. 161 inciso 2', grantsIas: true, grantsAviso: true, allowsRecargo: true },
+    // Art. 161 bis — invalidez (termina de forma automática, sin aviso previo)
+    invalidez:             { label: 'Invalidez del trabajador', articulo: 'Art. 161 bis', grantsIas: true, grantsAviso: false, allowsRecargo: false },
+    // Art. 171 — autodespido / despido indirecto
+    autodespido:           { label: 'Autodespido / despido indirecto', articulo: 'Art. 171', grantsIas: true, grantsAviso: true, allowsRecargo: true }
   };
   function causalActual() {
     const val = document.getElementById('causal').value;
@@ -665,6 +737,7 @@
     document.getElementById('grupoRecargo').style.display = recargoActivo ? 'block' : 'none';
 
     const nota = document.getElementById('causalNote');
+    const causalVal = document.getElementById('causal').value;
     if (!cfg.grantsIas && !recargoActivo) {
       nota.style.display = 'block';
       nota.innerHTML = `Con <strong>${cfg.label} (${cfg.articulo})</strong> no corresponde indemnización por ` +
@@ -676,6 +749,15 @@
       nota.innerHTML = `Como marcaste que el despido fue declarado injustificado/improcedente, ahora sí ` +
         `corresponden <strong>indemnización por años de servicio</strong> y <strong>aviso previo</strong>, ` +
         `más el recargo (Art. 168).`;
+    } else if (cfg.grantsIas && !cfg.grantsAviso) {
+      nota.style.display = 'block';
+      nota.innerHTML = `Con <strong>${cfg.label} (${cfg.articulo})</strong> corresponde indemnización por ` +
+        `años de servicio, pero <strong>no</strong> aviso previo (el término opera de forma automática, no ` +
+        `requiere carta de aviso).`;
+    } else if (causalVal === 'autodespido') {
+      nota.style.display = 'block';
+      nota.innerHTML = `Recuerda: en el autodespido (Art. 171) el recargo legal va de <strong>50% a 100%</strong> ` +
+        `de la indemnización por años de servicio (no 30%-100% como en otros despidos declarados injustificados).`;
     } else {
       nota.style.display = 'none';
     }
@@ -733,20 +815,11 @@
     const incluyeRecargo = cfgCausal.allowsRecargo && document.getElementById('chkRecargo').checked;
     const incluyeIas = cfgCausal.grantsIas || incluyeRecargo;
     const incluyeAviso = cfgCausal.grantsAviso || incluyeRecargo;
-    // 1. ANTIGÜEDAD
-    let y1 = inicio.getFullYear(), m1 = inicio.getMonth(), d1 = inicio.getDate();
-    let y2 = termino.getFullYear(), m2 = termino.getMonth(), d2 = termino.getDate();
-    let anios = y2 - y1;
-    let meses = m2 - m1;
-    let dias = d2 - d1 + 1;
-    if (dias < 0) {
-      meses--;
-      dias += 30;
-    }
-    if (meses < 0) {
-      anios--;
-      meses += 12;
-    }
+    // 1. ANTIGÜEDAD (misma lógica que tu planilla: DATEDIF Y/YM/MD con ajuste 30-31)
+    const antig = calcularAntiguedad(inicio, termino);
+    let anios = antig.anios;
+    let meses = antig.meses;
+    let dias = antig.dias;
     // 2. VACACIONES PROPORCIONALES
     const mesesTotales = meses + (anios * 12);
     const diasGeneradosSinRedondear = (1.25 * mesesTotales) + ((1.25 / 30) * dias);
