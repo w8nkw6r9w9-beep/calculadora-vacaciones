@@ -674,9 +674,15 @@
     return d;
   }
   function calcularAntiguedad(inicio, termino) {
-    const anios = datedifY(inicio, termino);
-    const mesesBase = datedifYM(inicio, termino);
-    const diasBase = datedifMD(inicio, termino);
+    // El día de término cuenta como día trabajado (conteo inclusivo), por eso
+    // se usa la fecha de término + 1 día para el cálculo de antigüedad. Ej:
+    // ingreso 18-05-2026 y término 28-07-2026 -> 2 meses y 11 días (no 10).
+    const terminoEfectivo = new Date(termino);
+    terminoEfectivo.setDate(terminoEfectivo.getDate() + 1);
+
+    const anios = datedifY(inicio, terminoEfectivo);
+    const mesesBase = datedifYM(inicio, terminoEfectivo);
+    const diasBase = datedifMD(inicio, terminoEfectivo);
     const ajuste = (diasBase === 30 || diasBase === 31) ? 1 : 0;
     // Nota: cuando la fecha de ingreso cae el día 31 y el término cruza un mes
     // corto (ej. hacia febrero), la resta de días puede dar un valor negativo
